@@ -6,7 +6,7 @@ with open("README.md") as f:
 with open("reqs/base-requirements.txt") as f:
     REQUIREMENTS = f.read().splitlines()
 
-NAME = "comut"
+NAME = "comut_ht"
 AUTHOR_NAME, AUTHOR_EMAIL = "Jett Crowdis", "jcrowdis@broadinstitute.org"
 CLASSIFIERS = [
     "Development Status :: 4 - Beta",

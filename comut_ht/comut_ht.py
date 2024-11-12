@@ -206,12 +206,15 @@ class CoMut:
                     # always plot a priority if present
                     elif len(present_priorities) == 1:
                         df_entry = present_priorities + ['Multiple']
-                        sorted_df_entry = cls._sort_list_by_list(df_entry, value_order)
-                        parsed_data.loc[category, sample] = tuple(sorted_df_entry)
+                        sorted_df_entry = cls._sort_list_by_list(
+                            df_entry, value_order)
+                        parsed_data.loc[category, sample] = tuple(
+                            sorted_df_entry)
 
                     # plot two priorities if present, ignoring others
                     elif len(present_priorities) == 2:
-                        df_entry = cls._sort_list_by_list(present_priorities, value_order)
+                        df_entry = cls._sort_list_by_list(
+                            present_priorities, value_order)
                         parsed_data.loc[category, sample] = tuple(df_entry)
 
         return parsed_data
@@ -361,17 +364,20 @@ class CoMut:
 
             # define default borders
             for value in borders:
-                mapping[value] = {'facecolor': 'none', 'edgecolor': 'black', 'linewidth': 1}
+                mapping[value] = {'facecolor': 'none',
+                                  'edgecolor': 'black', 'linewidth': 1}
 
             # assign colors to other unique values
             non_border = [val for val in unique_values if val not in borders]
             default_cmap = self._get_default_categorical_cmap(len(non_border))
             for i, value in enumerate(unique_values):
-                 mapping[value] = {'facecolor': default_cmap[i]}
+                mapping[value] = {'facecolor': default_cmap[i]}
 
             mapping['Absent'] = {'facecolor': 'white'}
-            mapping['Multiple'] = {'facecolor': palettable.colorbrewer.qualitative.Set1_7.mpl_colors[6]}
-            mapping['Not Available'] = {'facecolor': 'none', 'edgecolor': 'black', 'linewidth': 1}
+            mapping['Multiple'] = {
+                'facecolor': palettable.colorbrewer.qualitative.Set1_7.mpl_colors[6]}
+            mapping['Not Available'] = {
+                'facecolor': 'none', 'edgecolor': 'black', 'linewidth': 1}
 
         elif isinstance(mapping, dict):
 
@@ -380,11 +386,13 @@ class CoMut:
 
             # update user color map with reserved values if not present
             if 'Not Available' not in mapping:
-                mapping['Not Available'] = {'facecolor': 'none', 'edgecolor': 'black', 'linewidth': 1}
+                mapping['Not Available'] = {
+                    'facecolor': 'none', 'edgecolor': 'black', 'linewidth': 1}
             if 'Absent' not in mapping:
                 mapping['Absent'] = {'facecolor': 'white'}
             if 'Multiple' not in mapping:
-                mapping['Multiple'] = {'facecolor': palettable.colorbrewer.qualitative.Set1_7.mpl_colors[6]}
+                mapping['Multiple'] = {
+                    'facecolor': palettable.colorbrewer.qualitative.Set1_7.mpl_colors[6]}
 
             # check that all alt types present in data are in mapping
             if not unique_values.issubset(mapping.keys()):
@@ -396,7 +404,8 @@ class CoMut:
             for key, value in mapping.items():
                 if not isinstance(value, dict):
                     if key in borders:
-                        mapping[key] = {'facecolor': 'none', 'edgecolor': value}
+                        mapping[key] = {
+                            'facecolor': 'none', 'edgecolor': value}
                     else:
                         mapping[key] = {'facecolor': value}
 
@@ -411,7 +420,7 @@ class CoMut:
 
         # parse data into dataframe of tuples as required for plotting
         parsed_data = self._parse_categorical_data(data, category_order, self.samples,
-                                             value_order, priority)
+                                                   value_order, priority)
 
         # store plot data
         plot_data = {'data': parsed_data, 'patches_options': mapping,
@@ -472,7 +481,8 @@ class CoMut:
 
         # check that only one category is in the dataframe
         if len(set(data['category'])) > 1:
-            raise ValueError('Only one category is allowed for continuous data')
+            raise ValueError(
+                'Only one category is allowed for continuous data')
 
         # make default name
         if name is None:
@@ -494,7 +504,8 @@ class CoMut:
             if 'Absent' not in cat_mapping:
                 cat_mapping['Absent'] = {'facecolor': 'white'}
             if 'Not Available' not in cat_mapping:
-                cat_mapping['Not Available'] = {'facecolor': 'none', 'edgecolor': 'black', 'linewidth': 1}
+                cat_mapping['Not Available'] = {
+                    'facecolor': 'none', 'edgecolor': 'black', 'linewidth': 1}
 
         # if values in cat_mapping aren't kwargs, convert to patches kwargs
         for key, value in cat_mapping.items():
@@ -529,7 +540,7 @@ class CoMut:
         # data is now essentially categorical, so use that to parse data
         category_order = list(norm_data['category'].drop_duplicates())
         parsed_data = self._parse_categorical_data(data=norm_data, category_order=category_order,
-                                             sample_order=self.samples, value_order=[], priority=[])
+                                                   sample_order=self.samples, value_order=[], priority=[])
 
         # store plot data
         plot_data = {'data': parsed_data, 'patches_options': dict_mapping, 'tick_style': tick_style,
@@ -538,7 +549,7 @@ class CoMut:
         self._plots[name] = plot_data
         return None
 
-    def add_bar_data(self, data, name=None, stacked=False, mapping=None,
+    def add_bar_data(self, data, name=None, stacked=False, grouped=False, mapping=None,
                      ylabel='', bar_kwargs=None):
         '''Add a bar plot to the CoMut object
 
@@ -554,6 +565,9 @@ class CoMut:
 
         stacked: bool, default=False
             Whether the bar graph should be stacked.
+
+        grouped: bool, default=False
+            Whether 2 columns of the bar graph should be grouped.
 
         mapping: dict
             A mapping of column to color. Dictionary should map column name
@@ -604,7 +618,8 @@ class CoMut:
 
         # store plot data
         plot_data = {'data': bar_df_indexed, 'bar_options': mapping, 'type': 'bar',
-                     'stacked': stacked, 'ylabel': ylabel, 'bar_kwargs': bar_kwargs}
+                     'stacked': stacked, 'grouped': grouped, 'ylabel': ylabel,
+                     'bar_kwargs': bar_kwargs}
 
         self._plots[name] = plot_data
         return None
@@ -680,7 +695,7 @@ class CoMut:
         return None
 
     def _plot_patch_data(self, ax, data, name, mapping, borders, tick_style,
-                        x_padding=0, y_padding=0, tri_padding=0):
+                         x_padding=0, y_padding=0, tri_padding=0):
         '''Plot data represented as patches on CoMut plot
 
         Params:
@@ -746,7 +761,8 @@ class CoMut:
                 # plot Not Available if present
                 if 'Not Available' in cell_tuple:
                     if len(cell_tuple) > 1:
-                        raise ValueError('Not Available must be a value by itself')
+                        raise ValueError(
+                            'Not Available must be a value by itself')
 
                     # otherwise plot the Not Available patch. label = '' subverts legend
                     patch_options = mapping['Not Available']
@@ -760,8 +776,8 @@ class CoMut:
                     # plot the slashed line. This code is heuristic and does
                     # not currently scale well.
                     ax.plot([x_base + x_padding/2, x_base + width - x_padding/2], [y_base + y_padding/2, y_base + height - y_padding/2],
-                             color=patch_options['edgecolor'], linewidth=0.5,
-                             solid_capstyle='round')
+                            color=patch_options['edgecolor'], linewidth=0.5,
+                            solid_capstyle='round')
 
                     # go to next patch
                     continue
@@ -808,10 +824,12 @@ class CoMut:
 
                     # build triangles with triangle padding
                     tri_1, tri_2 = self._get_triangles(x_base, y_base, tri_padding,
-                                                 height, width)
+                                                       height, width)
 
-                    tri_1_patch = patches.Polygon(tri_1, label=alt_1_label, **patch_options_1)
-                    tri_2_patch = patches.Polygon(tri_2, label=alt_2_label, **patch_options_2)
+                    tri_1_patch = patches.Polygon(
+                        tri_1, label=alt_1_label, **patch_options_1)
+                    tri_2_patch = patches.Polygon(
+                        tri_2, label=alt_2_label, **patch_options_2)
 
                     ax.add_patch(tri_1_patch)
                     ax.add_patch(tri_2_patch)
@@ -849,7 +867,7 @@ class CoMut:
         self.axes[name] = ax
         return ax
 
-    def _plot_bar_data(self, ax, data, name, mapping, stacked, ylabel, bar_kwargs):
+    def _plot_bar_data(self, ax, data, name, mapping, stacked, grouped, ylabel, bar_kwargs):
         '''Plot bar plot on CoMut plot
 
         Params:
@@ -868,6 +886,9 @@ class CoMut:
 
         stacked: bool
             stacked from add_bar_data
+
+        grouped: bool
+            grouped from add_bar_data
 
         ylabel: str
             ylabel from add_bar_data
@@ -897,7 +918,8 @@ class CoMut:
                 else:
                     # calculate distance between previous and current column
                     prev_column = cum_bar_df.columns[i-1]
-                    bar_data = cum_bar_df.loc[:, column] - cum_bar_df.loc[:, prev_column]
+                    bar_data = cum_bar_df.loc[:, column] - \
+                        cum_bar_df.loc[:, prev_column]
 
                     # the previous column defines the bottom of the bars
                     bottom = cum_bar_df.loc[:, prev_column]
@@ -905,6 +927,15 @@ class CoMut:
                 # plot bar data
                 ax.bar(x_range, bar_data, align='center', color=color,
                        bottom=bottom, label=column, **bar_kwargs)
+
+        if grouped:
+            offset = [-0.23, 0.23]
+            for i in range(len(data.columns)):
+                column = data.columns[i]
+                color = mapping[column]
+
+                ax.bar(x_range + offset[i], data.iloc[:, i], align='center',
+                       color=color, label=column, **bar_kwargs)
 
         # plot unstacked bar. Label is '' to subvert legend.
         else:
@@ -984,7 +1015,8 @@ class CoMut:
         # currently, side plot must be paired with a categorical dataset
         paired_plot = self._plots[paired_name]
         if paired_plot['type'] != 'categorical':
-            raise ValueError('Side plots can only be added to categorical data')
+            raise ValueError(
+                'Side plots can only be added to categorical data')
 
         # set index to categories
         data_indexed = data.set_index('category')
@@ -1052,7 +1084,8 @@ class CoMut:
             x_vals = np.where(data['group'] == group)[0]
 
             # plot line plot connecting samples in group
-            ax.plot(x_vals + 0.5, [0.5]*len(x_vals), label=label, **plot_kwargs)
+            ax.plot(x_vals + 0.5, [0.5]*len(x_vals),
+                    label=label, **plot_kwargs)
 
         # make axes invisible and despine
         for loc in ['top', 'right', 'bottom', 'left']:
@@ -1066,7 +1099,7 @@ class CoMut:
         return self
 
     def _plot_side_bar_data(self, ax, name, data, mapping, position, stacked,
-                           xlabel, y_padding, bar_kwargs):
+                            xlabel, y_padding, bar_kwargs):
         '''Plot side bar plot on CoMut plot
 
         Params:
@@ -1124,7 +1157,8 @@ class CoMut:
                 else:
                     # calculate distance between previous and current column
                     prev_column = cum_bar_df.columns[i-1]
-                    bar_data = cum_bar_df.loc[:, column] - cum_bar_df.loc[:, prev_column]
+                    bar_data = cum_bar_df.loc[:, column] - \
+                        cum_bar_df.loc[:, prev_column]
 
                     # previous column defines the "bottom" of the bars
                     left = cum_bar_df.loc[:, prev_column]
@@ -1185,15 +1219,17 @@ class CoMut:
         # extract relevant plotting params depending on plot type, then plot
         if plot_type == 'categorical' or plot_type == 'continuous':
             mapping = self._plots[plot_name]['patches_options']
-            borders = self._plots[plot_name]['borders'] if plot_type == 'categorical' else []
+            borders = self._plots[plot_name]['borders'] if plot_type == 'categorical' else [
+            ]
             tick_style = self._plots[plot_name]['tick_style']
             ax = self._plot_patch_data(ax=ax, data=data, name=plot_name, mapping=mapping, borders=borders,
-                                      x_padding=x_padding, y_padding=y_padding, tri_padding=tri_padding,
-                                      tick_style=tick_style)
+                                       x_padding=x_padding, y_padding=y_padding, tri_padding=tri_padding,
+                                       tick_style=tick_style)
 
         elif plot_type == 'bar':
             mapping = self._plots[plot_name]['bar_options']
             stacked = self._plots[plot_name]['stacked']
+            grouped = self._plots[plot_name]['grouped']
             ylabel = self._plots[plot_name]['ylabel']
             bar_kwargs = self._plots[plot_name]['bar_kwargs']
 
@@ -1201,11 +1237,12 @@ class CoMut:
             if 'width' not in bar_kwargs:
                 bar_kwargs['width'] = 1 - 2*x_padding
             ax = self._plot_bar_data(ax=ax, data=data, name=plot_name, mapping=mapping,
-                                    stacked=stacked, ylabel=ylabel, bar_kwargs=bar_kwargs)
+                                     stacked=stacked, grouped=grouped, ylabel=ylabel, bar_kwargs=bar_kwargs)
 
         elif plot_type == 'indicator':
             plot_kwargs = self._plots[plot_name]['plot_options']
-            ax = self._plot_indicator_data(ax=ax, data=data, name=plot_name, plot_kwargs=plot_kwargs)
+            ax = self._plot_indicator_data(
+                ax=ax, data=data, name=plot_name, plot_kwargs=plot_kwargs)
 
         return ax
 
@@ -1225,7 +1262,8 @@ class CoMut:
         # determine the maximum number of right and left plots
         max_left, max_right = 0, 0
         for side_plots in self._side_plots.values():
-            positions = [side_plot['position'] for side_plot in side_plots.values()]
+            positions = [side_plot['position']
+                         for side_plot in side_plots.values()]
 
             if positions.count('left') > max_left:
                 max_left = positions.count('left')
@@ -1343,7 +1381,7 @@ class CoMut:
 
     def plot_comut(self, fig=None, spec=None, x_padding=0, y_padding=0,
                    tri_padding=0, heights=None, hspace=0.2, subplot_hspace=None,
-                   widths=None, wspace=0.2, structure=None, figsize=(10,6)):
+                   widths=None, wspace=0.2, structure=None, figsize=(10, 6)):
         '''plot the CoMut object
 
         Params:
@@ -1494,8 +1532,10 @@ class CoMut:
             # if only one plot in subplot, just add subplot and plot
             if len(plot) == 1:
                 plot_name = plot[0]
-                ax = fig.add_subplot(spec[num_subplots - i - 1, comut_idx], sharex=sharex)
-                ax = self._plot_data_on_axis(ax=ax, plot_name=plot_name, x_padding=x_padding, y_padding=y_padding, tri_padding=tri_padding)
+                ax = fig.add_subplot(
+                    spec[num_subplots - i - 1, comut_idx], sharex=sharex)
+                ax = self._plot_data_on_axis(
+                    ax=ax, plot_name=plot_name, x_padding=x_padding, y_padding=y_padding, tri_padding=tri_padding)
 
                 # extract all sideplots on this axis
                 side_plots = self._side_plots[plot_name]
@@ -1512,7 +1552,8 @@ class CoMut:
                         right_idx += 1
 
                     # sideplots are paired with central CoMut plot
-                    side_ax = fig.add_subplot(spec[num_subplots - i - 1, sideplot_idx])
+                    side_ax = fig.add_subplot(
+                        spec[num_subplots - i - 1, sideplot_idx])
                     side_ax = self._plot_side_bar_data(side_ax, side_name, y_padding=y_padding,
                                                        **side_plot)
 
@@ -1527,14 +1568,17 @@ class CoMut:
                 # reverse the heights to be bottom up
                 height = height[::-1]
                 subplot_spec = gridspec.GridSpecFromSubplotSpec(ncols=1, nrows=num_plots,
-                                                                hspace=subplot_hspace, subplot_spec=spec[num_subplots - i - 1, comut_idx],
+                                                                hspace=subplot_hspace, subplot_spec=spec[
+                                                                    num_subplots - i - 1, comut_idx],
                                                                 height_ratios=height)
                 # plot all data in subplots
                 for j, plot_name in enumerate(plot):
 
                     # plot the data on a subplot within that subgridspec
-                    ax = fig.add_subplot(subplot_spec[num_plots - j - 1, 0], sharex=sharex)
-                    ax = self._plot_data_on_axis(ax=ax, plot_name=plot_name, x_padding=x_padding, y_padding=y_padding, tri_padding=tri_padding)
+                    ax = fig.add_subplot(
+                        subplot_spec[num_plots - j - 1, 0], sharex=sharex)
+                    ax = self._plot_data_on_axis(
+                        ax=ax, plot_name=plot_name, x_padding=x_padding, y_padding=y_padding, tri_padding=tri_padding)
 
                     # side bar plots are not allowed for plots within a subplot
                     if self._side_plots[plot_name]:
@@ -1542,10 +1586,12 @@ class CoMut:
                                          'Plots within a subplot cannot have a side plot.'.format(plot_name))
 
         # add x axis labels to the bottom-most axis, make it visible
-        self.axes[first_plot].set_xticks(np.arange(0.5, len(self.samples) + 0.5))
+        self.axes[first_plot].set_xticks(
+            np.arange(0.5, len(self.samples) + 0.5))
         self.axes[first_plot].set_xticklabels(self.samples, rotation=90)
         self.axes[first_plot].get_xaxis().set_visible(True)
-        self.axes[first_plot].tick_params(axis='x', which='both', bottom=False, length=0)
+        self.axes[first_plot].tick_params(
+            axis='x', which='both', bottom=False, length=0)
 
         self.figure = fig
         return self
@@ -1613,7 +1659,8 @@ class CoMut:
 
         plot_type = self._plots[name]['type']
         if plot_type == 'continuous':
-            raise ValueError('add_axis_legend is not valid for continuous data.')
+            raise ValueError(
+                'add_axis_legend is not valid for continuous data.')
 
         # extract current handles and labels on axis
         handles, labels = self.axes[name].get_legend_handles_labels()
@@ -1714,8 +1761,8 @@ class CoMut:
             plot_type = plot_data['type']
 
             if plot_type in ['categorical', 'bar', 'indicator']:
-                # nonstacked bar charts don't need legend labels
-                if plot_type == 'bar' and not plot_data['stacked']:
+                # nonstacked and nongrouped bar charts don't need legend labels
+                if plot_type == 'bar' and not (plot_data['stacked'] or plot_data['grouped']):
                     continue
 
                 handles, labels = axis.get_legend_handles_labels()
@@ -1748,7 +1795,8 @@ class CoMut:
                 legend_patches.append(patches.Patch(color='white', alpha=0))
 
                 # rename labels
-                legend_labels = [rename.get(label, label) for label in legend_labels]
+                legend_labels = [rename.get(label, label)
+                                 for label in legend_labels]
 
         # add to the top axis if no axis is given
         if axis_name is None:
